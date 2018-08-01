@@ -11,7 +11,8 @@ jobs:
           command: |
             echo "START >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
             fastlane ios deploy
-            if [ $? -ne 0 ]
-              exit(1)
-            fi
+            echo $?
+            # if [ $? -ne 0 ]
+            #   exit(1)
+            # fi
             echo "END   >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
