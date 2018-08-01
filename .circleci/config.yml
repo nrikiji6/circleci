@@ -11,4 +11,5 @@ jobs:
           command: |
             echo "START >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
             fastlane ios deploy
+            echo $?
             echo "END   >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
