@@ -9,4 +9,6 @@ jobs:
       - checkout
       - run:
           command: |
-            echo "test"
+            echo "START >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+            fastlane ios deploy
+            echo "END   >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"

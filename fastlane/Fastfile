@@ -1,0 +1,69 @@
+platform :ios do
+  before_all do
+    if is_ci?
+      setup_circle_ci
+      import_certificate(
+        keychain_name: ENV["MATCH_KEYCHAIN_NAME"],
+        keychain_password: ENV["MATCH_KEYCHAIN_PASSWORD"],
+        certificate_path: 'example.p12',
+        certificate_password: ''
+      )
+    end
+    update_app_identifier(
+      xcodeproj: 'platforms/ios/EXAMPLE.xcodeproj',
+      plist_path: 'EXAMPLE/EXAMPLE-Info.plist',
+      app_identifier: 'jp.co.example'
+    )
+    disable_automatic_code_signing(
+      path: 'platforms/ios/EXAMPLE.xcodeproj'
+    )
+  end
+
+  desc "Build for iOS"
+  lane :deploy do |options|
+    if options[:release]
+      provisioning = 'EXAMPLE Dist'
+      export_method = 'app-store'
+      export_options = 'ExportOptions.plist'
+    else
+      provisioning = 'EXAMPLE Adhoc'
+      export_method = 'ad-hoc'
+      export_options = 'ExportOptions_Adhoc.plist'
+    end
+    
+    gym(
+      scheme: 'EXAMPLE',
+      workspace: 'platforms/ios/EXAMPLE.xcworkspace',
+      configuration: 'Release',
+      export_method: export_method,
+      clean: true,
+      verbose: true,
+      output_directory: 'build',
+      output_name: 'EXAMPLE',
+      xcargs: "OTHER_SWIFT_FLAGS='$(inherited) -DSTGING' " +
+              "PROVISIONING_PROFILE_SPECIFIER='#{provisioning}' " +
+              "CODE_SIGN_IDENTITY='iPhone Distribution' "
+      export_xcargs: '-allowProvisioningUpdates',
+      export_options: "fastlane/#{export_options}"
+    )
+
+    if options[:release]
+      deliver(
+        ipa: 'build/EXAMPLE.ipa',
+        app_version: options[:version],
+        platform: 'ios',
+        submit_for_review: false,
+        skip_screenshots: true,
+        force: true,
+        skip_metadata: true
+      )
+    else
+      deploygate(
+        api_token: ENV['DEPLOYGATE_API_KEY'],
+        user: ENV['DEPLOYGATE_USER'],
+        ipa: 'build/EXAMPLE.ipa',
+        distribution_key: ENV['DEPLOYGATE_DISTRIBUTION_KEY']
+      )
+    end
+  end
+end
