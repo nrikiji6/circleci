@@ -5,5 +5,11 @@ platform :ios do
   end
 
   lane :deploy do |options|
+    import_certificate(
+      keychain_name: ENV["MATCH_KEYCHAIN_NAME"],
+      keychain_password: ENV["MATCH_KEYCHAIN_PASSWORD"],
+      certificate_path: 'example.p12',
+      certificate_password: ''
+    )
   end
 end
